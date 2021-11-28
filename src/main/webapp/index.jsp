@@ -1,5 +1,5 @@
 <html>
 <body>
-<h4>This is index.jsp file for java-tomcat-sample context path-1</h4>
+<h4>Bye I am going to have lunch now</h4>
 </body>
 </html>
