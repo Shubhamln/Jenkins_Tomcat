@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven_Local'
+    }
+    parameters {
+        string(name: 'myParameter', defaultValue: 'myVal', description: 'Enter Parameter value?')
+    }
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building..'
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                dir("${env.WORKSPACE}/java-tomcat-sample"){
+                    sh "pwd"
+                    sh 'mvn clean install'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing..'
+                echo "${params.myParameter} is value retrieved!"
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+                deploy adapters: [tomcat9(credentialsId: '068bd52e-409e-4ee4-bade-ac96d5a6e2d3', path: '', url: 'http://172.31.7.35:8080/')], contextPath: 'java-tomcat-jenkinsfile-sample', war: '**/*.war'
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: '**/*.war', fingerprint: true
+        }
+    }
+}
