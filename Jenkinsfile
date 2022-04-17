@@ -3,7 +3,7 @@ pipeline{
   stages{
     stage("Git checkout"){
 	  steps{
-	    git branch: 'main', credentialsId: 'Github', url: 'https://github.com/Shubhamln/application.git'
+	    git branch: 'main', credentialsId: 'Github', url: 'https://github.com/Shubhamln/Jenkins_Tomcat.git'
 	  }
 	}
 	stage("Maven Build"){
