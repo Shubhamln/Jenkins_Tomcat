@@ -1,16 +1,27 @@
-pipeline {
-    agent any
-    stages {
-        stage('Build Application') {
-            steps {
-                sh '/opt/apache-maven-3.6.3/bin/mvn -f java-tomcat-sample/pom.xml clean package'
-            }
-            post {
-                success {
-                    echo "Now Archiving the Artifacts...."
-                    archiveArtifacts artifacts: '**/*.war'
-                }
-            }
+pipeline{
+  agent any
+  stages{
+    stage("Git checkout"){
+	  steps{
+	    git branch: 'main', credentialsId: 'Github', url: 'https://github.com/Shubhamln/application.git'
+	  }
+	}
+	stage("Maven Build"){
+	  steps{
+	    sh "mvn clean package"
+		sh "mv target/*.jar target/myapp.jar"
+	  }
+	}
+	stage("Deploy"){
+	  steps{
+	    sshagent(['ROOT']) {
+          sh """
+		    scp -o StrictHostKeyChecking=no target/myapp.jar ec2-user@172.31.24.38:/opt/apache-tomcat-9.0.35//webapps/
+		    ssh ec2-user@172.31.24.38 sudo tomcatdown
+		    ssh ec2-user@172.31.24.38 sudo tomcatup
+		  """
         }
-    }
+      }	  
+	}
+  }
 }
